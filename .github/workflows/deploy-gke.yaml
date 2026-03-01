@@ -1,0 +1,59 @@
+name: Deploy Python App to GKE
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: kube-demo-488400 # e.g. 'my-gcp-project'
+  AR_REPO_NAME: gke-demo-repo # e.g. 'clouddemo'
+  AR_LOCATION: asia-south1 # e.g. 'us-central1'
+  GKE_CLUSTER_NAME: hio-gke-cluster-std # e.g. 'clouddemo-linux'
+  GKE_ZONE: asia-south1-a # e.g. 'us-central1-a'
+  IMAGE_NAME: python-app
+  # Service account email created for GitHub Actions
+  SERVICE_ACCOUNT_EMAIL: github-actions-workflow@kube-demo-488400.iam.gserviceaccount.com
+  # Workload Identity Provider name stored as a GitHub secret
+  WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+
+jobs:
+  deploy:
+    permissions:
+      contents: 'read'
+      id-token: 'write' # Required for Workload Identity Federation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account: ${{ env.SERVICE_ACCOUNT_EMAIL }}
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Docker Auth to Artifact Registry
+        run: gcloud auth configure-docker ${{ env.AR_LOCATION }}-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |-
+          docker build -t "${{ env.AR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" ./
+          docker push "${{ env.AR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER_NAME }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Deploy to GKE
+        run: |-
+          # Replace the image name in the k8s manifest with the new image SHA
+          kubectl set image deployment/python-app-deployment python-app-container="${{ env.AR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" -f k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml
+
