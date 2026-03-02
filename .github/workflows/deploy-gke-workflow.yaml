@@ -16,11 +16,12 @@ env:
   # Workload Identity Provider name stored as a GitHub secret
 
 jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
-    runs-on: ubuntu-latest
-    environment: production
-
+  deploy:
+    permissions:
+      contents: 'read'
+      id-token: 'write' # Required for Workload Identity Federation
+    runs-on: ubuntu-latest  
+ 
     steps:
     - name: Checkout
       uses: actions/checkout@v5
