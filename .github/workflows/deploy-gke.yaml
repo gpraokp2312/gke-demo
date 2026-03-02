@@ -60,4 +60,5 @@ jobs:
           #kubectl apply -f k8s/deployment.yaml
           sed -i "s|image:.*|image: ${{ env.AR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/deployment.yaml
           kubectl apply -f k8s/deployment.yaml     
-         kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }} 
+          kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }}
+
