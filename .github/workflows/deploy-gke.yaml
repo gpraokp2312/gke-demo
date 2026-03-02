@@ -9,7 +9,7 @@ env:
   AR_REPO_NAME: test-registry # e.g. 'clouddemo'
   AR_LOCATION: asia-south1 # e.g. 'us-central1'
   GKE_CLUSTER: cluster-1 # e.g. 'clouddemo-linux'
-  GKE_ZONE: asia-south1-a # e.g. 'us-central1-a'
+  GKE_ZONE: asia-south1 # e.g. 'us-central1-a'
   IMAGE_NAME: python-app
   # Service account email created for GitHub Actions
   SERVICE_ACCOUNT_EMAIL: gke-github-sa@kube-demo-488400.iam.gserviceaccount.com
