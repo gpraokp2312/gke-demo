@@ -58,7 +58,7 @@ jobs:
           # Replace the image name in the k8s manifest with the new image SHA
           # kubectl set image deployment/python-app-deployment python-app-container="${{ env.AR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           #kubectl apply -f k8s/deployment.yaml
-          sed -i "s|image:.*|image: ${{ env.AR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/deployment.yaml
+          sed -i "s|image:.*|image: ${{ env.AR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:latest|g" k8s/deployment.yaml
           kubectl apply -f k8s/deployment.yaml     
           kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }}
 
