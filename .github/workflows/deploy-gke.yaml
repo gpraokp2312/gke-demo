@@ -14,6 +14,8 @@ env:
   # Service account email created for GitHub Actions
   SERVICE_ACCOUNT_EMAIL: gke-github-sa@kube-demo-488400.iam.gserviceaccount.com
   # Workload Identity Provider name stored as a GitHub secret
+  IMAGE_TAG: ${{ github.sha }}
+  DEPLOYMENT_NAME: python-app-deployment
 
 jobs:
   deploy:
@@ -54,5 +56,10 @@ jobs:
       - name: Deploy to GKE
         run: |-
           # Replace the image name in the k8s manifest with the new image SHA
-          kubectl set image deployment/python-app-deployment python-app-container="${{ env.AR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" -f k8s/deployment.yaml
-          kubectl apply -f k8s/deployment.yaml
+          - name: Deploy
+      run: |
+        gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
+        sed -i "s|deployment/python-app-deployment|${{ env.AR_REPO_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}|g" k8s/deployment.yaml
+        kubectl apply -f k8s/deployment.yaml
+        kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }} 
+
