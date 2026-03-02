@@ -56,7 +56,7 @@ jobs:
       - name: Deploy to GKE
         run: |-
           # Replace the image name in the k8s manifest with the new image SHA
-        kubectl set image deployment/python-app-deployment python-app-container="${{ env.AR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" 
+        kubectl set image deployment/python-app-deployment python-app-container=${{ env.AR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} 
         kubectl apply -f k8s/deployment.yaml
         kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }} 
 
