@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route('/')
 def hello_world():
     # Retrieve environment variable or use default
-    message = os.environ.get("APP_MESSAGE", "***  Hello from GKE, 04-03-2026!***")
+    message = os.environ.get("APP_MESSAGE", "***  Hello from GKE, 04-03-2026 ! ***")
     return f"<p>{message}</p>"
 
 if __name__ == "__main__":
