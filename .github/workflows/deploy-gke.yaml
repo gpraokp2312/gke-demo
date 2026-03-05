@@ -8,7 +8,7 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }} 
   AR_REPO_NAME: test-registry # e.g. 'clouddemo'
   AR_LOCATION: asia-south1 # e.g. 'us-central1'
-  GKE_CLUSTER: cluster-1 # e.g. 'clouddemo-linux'
+  GKE_CLUSTER: kube-demo-cluster # e.g. 'clouddemo-linux'
   GKE_ZONE: asia-south1 # e.g. 'us-central1-a'
   IMAGE_NAME: python-app
   # Service account email created for GitHub Actions
